@@ -6,7 +6,6 @@ import docx
 class Application():
 
     TOP_SPACE, LEFT_SPACE = 15, 30
-    TEXT_SIZE = 9
     UPPERCASE, LOWERCASE = None, None
 
     def __init__(self, master=None):
@@ -24,13 +23,14 @@ class Application():
         
         # Rows
         self.rows = []
+        rowspan = 7
         for t in range(4):
             r = ScrolledText(self.master, width=width, height=height)
-            r.grid(row=1, column=t)
+            r.grid(row=1, column=t, rowspan=rowspan)
             self.rows.append(r)
             r = None
         
-        # Checkboxes
+        # UPPER/lowercase option for header
         self.HEADER_UPPERCASE = tk.IntVar()
         self.HEADER_LOWERCASE = tk.IntVar()
         tk.Checkbutton(
@@ -44,6 +44,7 @@ class Application():
             variable=self.HEADER_LOWERCASE
         ).grid(row=0, column=cols+1, sticky='N')
         
+        # UPPER/lowercase option for rows
         self.ROWS_UPPERCASE = tk.IntVar()
         self.ROWS_LOWERCASE = tk.IntVar()
         tk.Checkbutton(
@@ -57,9 +58,16 @@ class Application():
             variable=self.ROWS_LOWERCASE
         ).grid(row=1, column=cols+1, sticky='N')
         
+        # Text size
+        tk.Label(self.master, text= "Tamany de lletra:").grid(row=2, column=cols, sticky="NW")
+        self.text_size = tk.Spinbox(self.master, values=(6,8,10,12,14,16,20))
+        self.text_size.delete(0)
+        self.text_size.insert(0,"8")
+        self.text_size.grid(row=2, column=cols+1, sticky="NW")
+        
         # Button
         self.do = tk.Button(text='Generar etiquetes', command=self.do_action)
-        self.do.grid(row=2, column=cols+1, sticky='EW')
+        self.do.grid(row=rowspan+2, column=cols+1)
         
     
     def do_action(self):
@@ -147,7 +155,11 @@ class Application():
                     
                     for run in paragraph.runs:
                         font = run.font
-                        font.size = docx.shared.Pt(self.TEXT_SIZE)
+                        try:
+                            font_size = int(self.text_size.get())
+                        except ValueError:
+                            font_size = 8
+                        font.size = docx.shared.Pt(font_size)
 
         document.save(output_name)
 
