@@ -31,6 +31,19 @@ class Application():
             r = None
         
         # Checkboxes
+        self.HEADER_UPPERCASE = tk.IntVar()
+        self.HEADER_LOWERCASE = tk.IntVar()
+        tk.Checkbutton(
+            self.master, 
+            text="en MAJUSCULES", 
+            variable=self.HEADER_UPPERCASE
+        ).grid(row=0, column=cols, sticky='N')
+        tk.Checkbutton(
+            self.master, 
+            text="en minuscules", 
+            variable=self.HEADER_LOWERCASE
+        ).grid(row=0, column=cols+1, sticky='N')
+        
         self.ROWS_UPPERCASE = tk.IntVar()
         self.ROWS_LOWERCASE = tk.IntVar()
         tk.Checkbutton(
@@ -64,21 +77,43 @@ class Application():
         self.master.destroy()
     
     
-    def process_text(self, text):
+    def format_cell(self, header, col):
         replacements = [
             ('\t', ' ')
             #, ('  ',' ')
         ]
+    
+        header = header.strip()
+        if self.HEADER_UPPERCASE.get(): header = header.upper()
+        if self.HEADER_LOWERCASE.get(): header = header.lower()
+        
+        col = col.strip()
         for search, replace in replacements:
-            text = text.replace(search, replace)
-        if self.ROWS_UPPERCASE.get():
-            text = text.upper()
-        if self.ROWS_LOWERCASE.get():
-            text = text.lower()
-        return text
+            col = col.replace(search, replace)
+        if self.ROWS_UPPERCASE.get(): col = col.upper()
+        if self.ROWS_LOWERCASE.get(): col = col.lower()
+        
+        return "{header}{sep}{text}{newline}" \
+                        .format(
+                            header=header,
+                            text=col,
+                            sep=": " if header and col else "",
+                            newline="\n"
+                        )
     
     
     def prepare_data(self):
+        """
+        Prepares cell values as shown below:
+        
+        header1   header2
+        -------   -------
+        row1_1    row_1_2      
+        row2_1    row_2_2
+        
+        cell[0] = 'header1: row1_1\nheader2: row_1_2'
+        cell[1] = 'header2: row2_1\nheader2: row_2_2'
+        """
         headers_text = [ h.get() for h in self.headers ]
         rows_text = [ r.get(1.0, tk.END) for r in self.rows ]
         
@@ -86,13 +121,7 @@ class Application():
         for header, col in zip(headers_text, rows_text):
             for i in range(len(col.splitlines())):
                 if not col=="":
-                    cells[i] += "{header}{sep}{text}{newline}" \
-                        .format(
-                            header=header if len(col.splitlines()[i].strip())>0 else "",
-                            text=self.process_text(col.splitlines()[i]),
-                            sep=": " if header and len(col.splitlines()[i].strip())>0 else "",
-                            newline="\n"
-                        )
+                    cells[i] += self.format_cell(header, col.splitlines()[i])
         return [cell for cell in cells if cell]
 
         
