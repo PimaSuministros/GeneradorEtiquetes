@@ -36,12 +36,12 @@ class Application():
         tk.Checkbutton(
             self.master, 
             text="en MAJUSCULES", 
-            variable=self.UPPERCASE
+            variable=self.ROWS_UPPERCASE
         ).grid(row=1, column=cols, sticky='N')
         tk.Checkbutton(
             self.master, 
             text="en minuscules", 
-            variable=self.LOWERCASE
+            variable=self.ROWS_LOWERCASE
         ).grid(row=1, column=cols+1, sticky='N')
         
         # Button
