@@ -2,8 +2,6 @@ import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
 from os.path import join
 import docx
-#import pygubu
-# ----
 
 class Application():
 
